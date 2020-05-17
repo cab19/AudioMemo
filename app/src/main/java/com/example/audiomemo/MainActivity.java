@@ -35,7 +35,29 @@ public class MainActivity extends AppCompatActivity {
     private boolean permissionToRecordAccepted = false;
     private String [] permissions = {Manifest.permission.RECORD_AUDIO};
 
-    // this is a git test...
+    // setup create db helper
+    DatabaseHelper db;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        db = new DatabaseHelper(this); // instantiate dbhelper object
+
+        // DB TESTING
+        long result = db.insert("testfile", "test description");
+
+        // link to UI elements
+        playButton = findViewById(R.id.playButton);
+        recordButton = findViewById(R.id.recordButton);
+
+        // Record to the external cache directory for visibility
+        fileName = getExternalCacheDir().getAbsolutePath(); // setting path for the audio file
+        fileName += "/audiorecordtest.m4a"; // setting filename for audio file
+
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -107,23 +129,6 @@ public class MainActivity extends AppCompatActivity {
             recorder.release();
             recorder = null;
         }
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        playButton = findViewById(R.id.playButton);
-        recordButton = findViewById(R.id.recordButton);
-
-        // Record to the external cache directory for visibility
-        fileName = getExternalCacheDir().getAbsolutePath();
-        fileName += "/audiorecordtest.m4a";
-
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-
     }
 
     @Override // overriding the onstop method to make sure all resources are released when app is stopped.

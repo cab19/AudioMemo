@@ -19,23 +19,23 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
     private Context context;
 
     // constructor
-    public CategoryAdapter(Context context, List<Recording> recordingList) {
+    public RecordingAdapter(Context context, List<Recording> recordingList) {
         this.context = context;
-        this.recordingList = categoryList;
+        this.recordingList = recordingList;
     }
 
 
     // handles the linking of UI elements
     public class MyViewHolder extends RecyclerView.ViewHolder{
         // member variables to hold title and logo
-        //TextView tvTitle;
-        //ImageView ivLogo;
+        TextView tvFilename;
+        TextView tvDescription;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             // link to UI elements
-            tvTitle = itemView.findViewById(R.id.tvTitle);
-            ivLogo = itemView.findViewById(R.id.ivLogo);
+            tvFilename = itemView.findViewById(R.id.tvFilename);
+            tvDescription = itemView.findViewById(R.id.tvDescription);
         }
     }
 
@@ -43,19 +43,20 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
     @Override // viewholder
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context); // create layout inflater object
-        View view = inflater.inflate(R.layout.category_row, parent, false); // assign xml layout into view
+        View view = inflater.inflate(R.layout.recording_row, parent, false); // assign xml layout into view
         return new MyViewHolder(view); // return the view
     }
 
     @Override // populates each view with provided data
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
-        holder.tvTitle.setText(categoryList.get(position).getTitle()); //updates title to title value in array at position
-        holder.ivLogo.setImageResource(categoryList.get(position).getLogo()); //updates logo to image value in array at position
+        holder.tvFilename.setText(recordingList.get(position).getFilename()); //updates title to title value in array at position
+        holder.tvDescription.setText(recordingList.get(position).getDescription()); //updates description to value at current position
+        //holder.tvDescription.setImageResource(categoryList.get(position).getLogo()); //updates logo to image value in array at position
     }
 
     @Override
     public int getItemCount() {
-        return categoryList.size(); // returns amount of items in list
+        return recordingList.size(); // returns amount of items in list
     }
 }
 
