@@ -5,8 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -44,10 +48,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return newRowId;
     }
 
-    public boolean fetchUser (String username , String password)
+    public List<Recording> getRecordings ()
     {
+
+        List<Recording> recordings = new ArrayList<>();
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_NAME;
+                //+ " ORDER BY " + Note.COLUMN_TIMESTAMP + " DESC";
+
+        SQLiteDatabase db = getReadableDatabase(); // create db for reading
+        Cursor cursor = db.rawQuery(selectQuery, null); // execute query
+
+        // loop through results from DB
+        if (cursor.moveToFirst()) {
+            do {
+                Recording recording = new Recording();
+                recording.setFilename(cursor.getString(cursor.getColumnIndex(COLUMN_FILENAME)));
+                recording.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
+                Log.e("SQL: ", recording.getFilename());
+
+                //note.setId(cursor.getInt(cursor.getColumnIndex(Note.COLUMN_ID)));
+                //note.setNote(cursor.getString(cursor.getColumnIndex(Note.COLUMN_NOTE)));
+                //note.setTimestamp(cursor.getString(cursor.getColumnIndex(Note.COLUMN_TIMESTAMP)));
+
+                recordings.add(recording);
+            } while (cursor.moveToNext());
+        }
+
+        return recordings;
+
+        /*
+
         SQLiteDatabase db = getReadableDatabase();
         String[] columns = {COLUMN_ID};
+        String selection = "*";
+        db.query(TABLE_NAME, columns,
+        //Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+
         /*
         String selection = COLUMN_USER + "= ? and " + COLUMN_PWD +"=?";
         String[] selectionArgs = {username, password};
@@ -61,6 +99,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else
             return false;
         */
-        return false;
+
+
+        //List<Recording> sourceList = new ArrayList<>(); // create list of news source objects
     }
 }

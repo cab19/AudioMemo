@@ -11,12 +11,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
+import java.util.Calendar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,16 +48,37 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         db = new DatabaseHelper(this); // instantiate dbhelper object
 
-        // DB TESTING
-        long result = db.insert("testfile", "test description");
-
         // link to UI elements
         playButton = findViewById(R.id.playButton);
         recordButton = findViewById(R.id.recordButton);
 
         // Record to the external cache directory for visibility
         fileName = getExternalCacheDir().getAbsolutePath(); // setting path for the audio file
-        fileName += "/audiorecordtest.m4a"; // setting filename for audio file
+        fileName += "/"+Calendar.getInstance().getTimeInMillis()+".m4a"; // setting filename for audio using time
+        Log.e(LOG_TAG, "filename: "+fileName); // date testing
+
+        // DB TESTING
+        if(db.insert(fileName, "test description") < 1)
+            Log.e(LOG_TAG, "SQLite ERROR");
+
+        List<Recording> recordings = db.getRecordings(); // get all recordings
+        RecyclerView recyclerView; // create recyclerView
+        recyclerView = findViewById(R.id.recordRecycler); // link to recycler UI element
+
+
+
+        RecordingAdapter myAdapter = new RecordingAdapter(this, recordings); // create an adapter
+        LinearLayoutManager t = new LinearLayoutManager(this);
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                t.getOrientation());
+        recyclerView.addItemDecoration(mDividerItemDecoration);
+        recyclerView.setLayoutManager(t); // set layout manager
+        recyclerView.setAdapter(myAdapter); // set adapter to one instantiated above
+
+
+
+
+
 
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
@@ -67,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
         }
-        if (!permissionToRecordAccepted) finish();
+        if (!permissionToRecordAccepted) finish(); // CHECK?? didn't get permission so close app, think it might destroy the dialog
 
     }
 
@@ -94,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void handleRecording(View v) {
-        Log.e(LOG_TAG, "recording clicked"+fileName);
+        Log.i(LOG_TAG, "recording clicked"+fileName);
         boolRecording = (boolRecording) ? false : true; // toggle recording boolean
         if(boolRecording) {
             recordButton.setText("Stop recording");
@@ -109,11 +134,6 @@ public class MainActivity extends AppCompatActivity {
             recorder.setAudioEncodingBitRate(16*44100);
             recorder.setAudioSamplingRate(44100);
             recorder.setOutputFile(fileName);
-
-
-
-
-
 
             try {
                 recorder.prepare();

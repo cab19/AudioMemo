@@ -5,6 +5,11 @@ public class Recording {
     private String strFilename;
     private String strDescription;
 
+    // empty constructor
+    public Recording() {
+
+    }
+
     // Constructor
     public Recording(String filename, String description) {
         // assign passed in values to member variables
