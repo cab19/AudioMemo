@@ -17,10 +17,13 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/tvFilename"
+                android:id="@+id/tvDateStamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="filename"
+                android:padding="5dp"
+                android:text="@string/dateStamp"
+                android:textColor="@color/dateStamp"
+                android:textColorLink="#FFFFFF"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,8 +32,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="45dp"
-                android:text="description"
-                app:layout_constraintStart_toEndOf="@+id/tvFilename"
+                android:padding="5dp"
+                android:text="@string/description"
+                android:textColor="@color/description"
+                app:layout_constraintStart_toEndOf="@+id/tvDateStamp"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

@@ -19,7 +19,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "recording_id";
     public static final String COLUMN_FILENAME = "filename";
     public static final String COLUMN_DESCRIPTION = "description";
-    public static final int DATABASE_VERSION = 1;
+    public static final String COLUMN_TIMESTAMP = "timestamp";
+    public static final int DATABASE_VERSION = 3;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -28,7 +29,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE "+TABLE_NAME+"("+COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+COLUMN_FILENAME+" TEXT, "+COLUMN_DESCRIPTION+" TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE "+TABLE_NAME +"("+
+                COLUMN_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                COLUMN_FILENAME+" TEXT, "+
+                COLUMN_DESCRIPTION+" TEXT, "+
+                COLUMN_TIMESTAMP+" DEFAULT CURRENT_TIMESTAMP)");
     }
 
     @Override
@@ -63,9 +68,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // loop through results from DB
         if (cursor.moveToFirst()) {
             do {
-                Recording recording = new Recording();
+                Recording recording = new Recording(); // instantiate recording object to hold details
+                recording.setID(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
                 recording.setFilename(cursor.getString(cursor.getColumnIndex(COLUMN_FILENAME)));
                 recording.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
+                recording.setTimeStamp(cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
+
                 Log.e("SQL: ", recording.getFilename());
 
                 //note.setId(cursor.getInt(cursor.getColumnIndex(Note.COLUMN_ID)));
@@ -76,7 +84,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
-        return recordings;
+        db.close(); // destroy db
+        return recordings; // return list of recordings
 
         /*
 

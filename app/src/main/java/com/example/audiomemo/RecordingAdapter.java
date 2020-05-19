@@ -1,16 +1,18 @@
 package com.example.audiomemo;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
-import androidx.appcompat.app.AppCompatActivity;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyViewHolder> {
@@ -28,13 +30,13 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
     // handles the linking of UI elements
     public class MyViewHolder extends RecyclerView.ViewHolder{
         // member variables to hold title and logo
-        TextView tvFilename;
+        TextView tvTimeStamp;
         TextView tvDescription;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             // link to UI elements
-            tvFilename = itemView.findViewById(R.id.tvFilename);
+            tvTimeStamp = itemView.findViewById(R.id.tvDateStamp);
             tvDescription = itemView.findViewById(R.id.tvDescription);
         }
     }
@@ -49,9 +51,22 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
 
     @Override // populates each view with provided data
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
-        holder.tvFilename.setText(recordingList.get(position).getFilename()); //updates title to title value in array at position
+        //Log.e("TIME?", "SQLite ERROR");
+        holder.tvTimeStamp.setText(formatDate(recordingList.get(position).getTimeStamp())); // update timestamp, using formatted date from db
         holder.tvDescription.setText(recordingList.get(position).getDescription()); //updates description to value at current position
         //holder.tvDescription.setImageResource(categoryList.get(position).getLogo()); //updates logo to image value in array at position
+    }
+
+    private String formatDate(String strDate) {
+        try {
+            SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // set parse mask
+            Date date = sdformat.parse(strDate); // create date object
+            SimpleDateFormat sdfOutput = new SimpleDateFormat("d MMM yy"); // updated format
+            return sdfOutput.format(date); // convert to string and return
+        } catch (ParseException e) {
+            e.printStackTrace(); // print error trace
+        }
+        return ""; // required but never called...
     }
 
     @Override

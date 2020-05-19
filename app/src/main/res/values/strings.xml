@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Audio Memo</string>
+    <string name="dateStamp">Date Stamp</string>
+    <string name="description">Description</string>
 </resources>

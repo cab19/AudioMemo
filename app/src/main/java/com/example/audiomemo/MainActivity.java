@@ -49,39 +49,35 @@ public class MainActivity extends AppCompatActivity {
         db = new DatabaseHelper(this); // instantiate dbhelper object
 
         // link to UI elements
-        playButton = findViewById(R.id.playButton);
-        recordButton = findViewById(R.id.recordButton);
+        //playButton = findViewById(R.id.playButton); // old testing buttons
+        //recordButton = findViewById(R.id.recordButton); // old testing buttons
+
 
         // Record to the external cache directory for visibility
         fileName = getExternalCacheDir().getAbsolutePath(); // setting path for the audio file
         fileName += "/"+Calendar.getInstance().getTimeInMillis()+".m4a"; // setting filename for audio using time
-        Log.e(LOG_TAG, "filename: "+fileName); // date testing
 
+/*
         // DB TESTING
         if(db.insert(fileName, "test description") < 1)
             Log.e(LOG_TAG, "SQLite ERROR");
 
+ */
+        // RECYCLER VIEW
         List<Recording> recordings = db.getRecordings(); // get all recordings
         RecyclerView recyclerView; // create recyclerView
         recyclerView = findViewById(R.id.recordRecycler); // link to recycler UI element
 
-
-
         RecordingAdapter myAdapter = new RecordingAdapter(this, recordings); // create an adapter
-        LinearLayoutManager t = new LinearLayoutManager(this);
+        LinearLayoutManager t = new LinearLayoutManager(this); // create linear layout manager
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                t.getOrientation());
-        recyclerView.addItemDecoration(mDividerItemDecoration);
+                t.getOrientation()); // creating divider for between rows in recycler
+        recyclerView.addItemDecoration(mDividerItemDecoration); // adding divider
         recyclerView.setLayoutManager(t); // set layout manager
         recyclerView.setAdapter(myAdapter); // set adapter to one instantiated above
 
-
-
-
-
-
+        // AUDIO PERMISSION
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-
     }
 
     @Override
@@ -96,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void handlePlaying(View v) {
+    public void handlePlaying(View v) { // this is the start playing event handler
         boolPlaying = (boolPlaying) ? false : true; // toggle playing
         if(boolPlaying) {
             playButton.setText("Stop playing");
@@ -118,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void handleRecording(View v) {
+    public void handleRecording(View v) { // this is the start recording event handler
         Log.i(LOG_TAG, "recording clicked"+fileName);
         boolRecording = (boolRecording) ? false : true; // toggle recording boolean
         if(boolRecording) {
@@ -151,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override // overriding the onstop method to make sure all resources are released when app is stopped.
+    @Override // overriding the onstop method to make sure all resources are released when stopped.
     public void onStop() {
         super.onStop();
         if (recorder != null) {

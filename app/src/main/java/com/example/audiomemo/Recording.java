@@ -2,8 +2,10 @@ package com.example.audiomemo;
 
 public class Recording {
     // member variables to store recording data
-    private String strFilename;
-    private String strDescription;
+    private Integer mID;
+    private String mFilename;
+    private String mDescription;
+    private String mTimeStamp;
 
     // empty constructor
     public Recording() {
@@ -11,27 +13,41 @@ public class Recording {
     }
 
     // Constructor
-    public Recording(String filename, String description) {
+    public Recording(Integer ID, String filename, String description, String timeStamp) {
         // assign passed in values to member variables
-        strFilename = filename;
-        strDescription = description;
+        mID = ID;
+        mFilename = filename;
+        mDescription = description;
+        mTimeStamp = timeStamp;
     }
 
     //Getter & Setter methods
 
+    public Integer getID() { return mID; }
+
+    public void setID(Integer ID) { this.mID = ID; }
+
     public String getFilename() {
-        return strFilename;
+        return mFilename;
     }
 
     public void setFilename(String strFilename) {
-        this.strFilename = strFilename;
+        this.mFilename = strFilename;
     }
 
     public String getDescription() {
-        return strDescription;
+        return mDescription;
     }
 
     public void setDescription(String strDescription) {
-        this.strDescription = strDescription;
+        this.mDescription = strDescription;
+    }
+
+    public String getTimeStamp() {
+        return mTimeStamp;
+    }
+
+    public void setTimeStamp(String strTimeStamp) {
+        this.mTimeStamp = strTimeStamp;
     }
 }
