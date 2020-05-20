@@ -60,8 +60,8 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
     private String formatDate(String strDate) {
         try {
             SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // set parse mask
-            Date date = sdformat.parse(strDate); // create date object
-            SimpleDateFormat sdfOutput = new SimpleDateFormat("d MMM yy"); // updated format
+            Date date = sdformat.parse(strDate); // parse db data into date object
+            SimpleDateFormat sdfOutput = new SimpleDateFormat("d MMM yy"); // update format of date
             return sdfOutput.format(date); // convert to string and return
         } catch (ParseException e) {
             e.printStackTrace(); // print error trace

@@ -76,6 +76,19 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(t); // set layout manager
         recyclerView.setAdapter(myAdapter); // set adapter to one instantiated above
 
+        recyclerView.addOnItemTouchListener(new RecyclerViewListener(this,
+                recyclerView, new RecyclerViewListener.ClickListener() {
+            @Override
+            public void onClick(View view, final int position) {
+                Log.e("CLICK", "recycler clicked: "+position);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                Log.e("CLICK", "recycler LONG clicked: "+position);
+            }
+        }));
+
         // AUDIO PERMISSION
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
     }
@@ -91,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
         if (!permissionToRecordAccepted) finish(); // CHECK?? didn't get permission so close app, think it might destroy the dialog
 
     }
+
+
 
     public void handlePlaying(View v) { // this is the start playing event handler
         boolPlaying = (boolPlaying) ? false : true; // toggle playing

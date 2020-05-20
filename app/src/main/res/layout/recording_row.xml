@@ -16,10 +16,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="10dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="6dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/group_aqua" />
+
             <TextView
                 android:id="@+id/tvDateStamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
                 android:padding="5dp"
                 android:text="@string/dateStamp"
                 android:textColor="@color/dateStamp"
@@ -31,7 +41,7 @@
                 android:id="@+id/tvDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="45dp"
+                android:layout_marginStart="15dp"
                 android:padding="5dp"
                 android:text="@string/description"
                 android:textColor="@color/description"
