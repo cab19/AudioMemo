@@ -42,7 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public long insert (String filename , String description)
+    public long insertRecording(String filename , String description)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -53,63 +53,72 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return newRowId;
     }
 
-    public List<Recording> getRecordings ()
+    public Recording getRecording(long id)
     {
-
-        List<Recording> recordings = new ArrayList<>();
-
-        // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_NAME;
-                //+ " ORDER BY " + Note.COLUMN_TIMESTAMP + " DESC";
-
         SQLiteDatabase db = getReadableDatabase(); // create db for reading
-        Cursor cursor = db.rawQuery(selectQuery, null); // execute query
+        Recording recording = new Recording();
+
+        Cursor cursor = db.query(TABLE_NAME,
+                new String[]{COLUMN_ID, COLUMN_FILENAME, COLUMN_DESCRIPTION, COLUMN_TIMESTAMP},
+                COLUMN_ID + "=?",
+                new String[]{String.valueOf(id)}, null, null, null, null);
+
+        // if data? set recording, otherwise print error
+        if (cursor.moveToFirst()) {
+            recording.setID(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
+            recording.setFilename(cursor.getString(cursor.getColumnIndex(COLUMN_FILENAME)));
+            recording.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
+            recording.setTimeStamp(cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
+        }
+        else
+            Log.e("SQL","ERROR NO RESULTS");
+
+        db.close(); // destroy db
+        return recording; // return recording
+    }
+
+    public List<Recording> getAllRecordings ()
+    {
+        List<Recording> recordings = new ArrayList<>(); // list to hold recordings
+        SQLiteDatabase db = getReadableDatabase(); // create db for reading
+        Cursor cursor = db.query(TABLE_NAME,
+                new String[]{COLUMN_ID, COLUMN_FILENAME, COLUMN_DESCRIPTION, COLUMN_TIMESTAMP},
+                null,
+                null, null, null, COLUMN_ID+" DESC", null);
 
         // loop through results from DB
         if (cursor.moveToFirst()) {
             do {
-                Recording recording = new Recording(); // instantiate recording object to hold details
-                recording.setID(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
-                recording.setFilename(cursor.getString(cursor.getColumnIndex(COLUMN_FILENAME)));
-                recording.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
-                recording.setTimeStamp(cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP)));
+                Recording recording = new Recording(
+                        cursor.getInt(cursor.getColumnIndex(COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(COLUMN_FILENAME)),
+                        cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)),
+                        cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP))
+                ); // instantiate recording object
 
                 Log.e("SQL: ", recording.getFilename());
-
-                //note.setId(cursor.getInt(cursor.getColumnIndex(Note.COLUMN_ID)));
-                //note.setNote(cursor.getString(cursor.getColumnIndex(Note.COLUMN_NOTE)));
-                //note.setTimestamp(cursor.getString(cursor.getColumnIndex(Note.COLUMN_TIMESTAMP)));
-
                 recordings.add(recording);
             } while (cursor.moveToNext());
         }
 
         db.close(); // destroy db
         return recordings; // return list of recordings
+    }
 
-        /*
-
-        SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {COLUMN_ID};
-        String selection = "*";
-        db.query(TABLE_NAME, columns,
-        //Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-
-        /*
-        String selection = COLUMN_USER + "= ? and " + COLUMN_PWD +"=?";
-        String[] selectionArgs = {username, password};
-        Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-        int numberOfRows = cursor.getCount();
-        cursor.close();
+    public long updateRecording(Recording recording) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_DESCRIPTION, recording.getDescription());
+        long response = db.update(TABLE_NAME, contentValues, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(recording.getID())});
         db.close();
+        return response;
+    }
 
-        if (numberOfRows > 0)
-            return true;
-        else
-            return false;
-        */
-
-
-        //List<Recording> sourceList = new ArrayList<>(); // create list of news source objects
+    public void deleteRecording(Recording recording) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(recording.getID())});
+        db.close();
     }
 }

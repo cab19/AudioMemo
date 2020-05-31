@@ -18,7 +18,7 @@ public class RecyclerViewListener implements RecyclerView.OnItemTouchListener {
             this.clicklistener = clicklistener;
             gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
-                public boolean onSingleTapUp(MotionEvent e) {
+                public boolean onSingleTapUp(MotionEvent e) { // single click, "short" click
                     return true;
                 }
 
@@ -26,7 +26,7 @@ public class RecyclerViewListener implements RecyclerView.OnItemTouchListener {
                 public void onLongPress(MotionEvent e) {
                     View child = recyclerView.findChildViewUnder(e.getX(), e.getY()); // determine location
                     if (child != null && clicklistener != null) { // check it's a valid event
-                        clicklistener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
+                        clicklistener.onLongClick(child, recyclerView.getChildAdapterPosition(child)); // handle long click
                     }
                 }
             });
@@ -34,15 +34,15 @@ public class RecyclerViewListener implements RecyclerView.OnItemTouchListener {
 
     @Override
     public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent e) {
-        View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
-        if (child != null && clicklistener != null && gestureDetector.onTouchEvent(e)) {
-            clicklistener.onClick(child, recyclerView.getChildAdapterPosition(child));
+        View child = recyclerView.findChildViewUnder(e.getX(), e.getY()); // get location of click
+        if (child != null && clicklistener != null && gestureDetector.onTouchEvent(e)) { // ensure event is not null
+            clicklistener.onClick(child, recyclerView.getChildAdapterPosition(child)); // send position
         }
             return false;
     }
 
     @Override
-    public void onTouchEvent(RecyclerView recyclerView, MotionEvent e) {
+    public void onTouchEvent(RecyclerView recyclerView, MotionEvent e) { // prevent default
 
     }
 
@@ -51,6 +51,7 @@ public class RecyclerViewListener implements RecyclerView.OnItemTouchListener {
 
     }
 
+    // interface, used to ensure calling class implements below click handlers
     public interface ClickListener {
         void onClick(View view, int position);
         void onLongClick(View view, int position);

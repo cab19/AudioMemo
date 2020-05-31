@@ -1,6 +1,8 @@
 package com.example.audiomemo;
 
-public class Recording {
+import java.io.Serializable;
+
+public class Recording implements Serializable {
     // member variables to store recording data
     private Integer mID;
     private String mFilename;
