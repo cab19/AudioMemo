@@ -14,13 +14,13 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/imageView3"
                 android:layout_width="10dp"
                 android:layout_height="20dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="20dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/group_aqua" />
@@ -29,23 +29,28 @@
                 android:id="@+id/tvDateStamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="30dp"
                 android:padding="5dp"
                 android:text="@string/dateStamp"
                 android:textColor="@color/dateStamp"
                 android:textColorLink="#FFFFFF"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
 
             <TextView
                 android:id="@+id/tvDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:padding="5dp"
+                android:layout_marginStart="30dp"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="5dp"
+                android:paddingRight="5dp"
                 android:text="@string/description"
                 android:textColor="@color/description"
-                app:layout_constraintStart_toEndOf="@+id/tvDateStamp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
                 // stop recording, present saveMemoDialog, user can confirm and add description or cancel
                 Log.e("CLICK", "FAB stop clicked: ");
                 stopRecording(view);
-                openDialog(false, null);
+                openDialog(false, null, -1);
                 // save should add to data to db
                 // cancel should delete recording file
             }
@@ -247,15 +247,15 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
     // DIALOG
 
     // just need a description
-    public void openDialog(Boolean error, Recording recording) {
+    public void openDialog(Boolean error, Recording recording, int position) {
         Log.e("CLICK", "open dialog: ");
-        SaveRecordingDialog saveDialog = SaveRecordingDialog.newInstance(error, recording);
+        SaveRecordingDialog saveDialog = SaveRecordingDialog.newInstance(error, recording, position);
         saveDialog.show(getSupportFragmentManager(), "Save Dialog");
     }
 
     // OVERRIDE SaveRecordingDialog listener interface to handle button events
     @Override
-    public void onDialogPositiveClick(int recordingID, String strDescription) { // ok button clicked
+    public void onDialogPositiveClick(int recordingID, String strDescription, int position) { // ok button clicked
         // EITHER INSERT OR UPDATE
         // INSERT recordingID == -1
 
@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
         Recording temp;
         // Check that description is not null
         if(strDescription.length() == 0)
-            openDialog(true,null); // show dialog again with error message
+            openDialog(true,null, -1); // show dialog again with error message
         else{ // save memo
             // need to ascertain if this is an edit or insert...
             if(recordingID!=-1){ //UPDATE
@@ -271,13 +271,8 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
                 temp.setDescription(strDescription); //update description
                 db.updateRecording(temp); //up db
                 // refreshing the list
-
-                //GET POSITION
-                Log.e(LOG_TAG, "INDEX= "+ recordings.indexOf(temp)); // print error to log
-
-                //UP TO HERE, NEED TO GET POSITION OF ITEM IN RECYCLER TO BE ABLE TO UPDATE IT
-                //recordings.set(position, n);
-                //mAdapter.notifyItemChanged(position);
+                recordings.set(position, temp);
+                mAdapter.notifyItemChanged(position);
             }
             else { // INSERT
                 long id = db.insertRecording(fileName, strDescription); // insert new memo
@@ -327,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
                 if (selection == 0) { // reference to selection, 0=edit or 1=delete
                     //showNoteDialog(true, notesList.get(position), position);
                     //saveRecordingDialog - pass recording in, if recording not null insert to db otherwise update
-                    openDialog(false, tempRec);
+                    openDialog(false, tempRec, position);
 
                     Log.e(LOG_TAG, "Open saverecordingdialog "+tempRec.getID()); // testing remove
                 } else {

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <ImageButton
+        android:id="@+id/playButton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="16dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_play_circle_outline_black_48dp"
+        tools:layout_editor_absoluteY="122dp" />
+
+    <ImageButton
+        android:id="@+id/pauseButton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="152dp"
+        android:layout_marginTop="136dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_pause_circle_outline_black_48dp" />
+
+    <ImageButton
+        android:id="@+id/stopButton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="252dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_stop" />
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="description"
+        tools:layout_editor_absoluteX="113dp"
+        tools:layout_editor_absoluteY="27dp" />
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="11/05/2020"
+        tools:layout_editor_absoluteX="130dp"
+        tools:layout_editor_absoluteY="88dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

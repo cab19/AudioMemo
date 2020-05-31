@@ -14,6 +14,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyViewHolder> {
     // member variables to hold passed in data
@@ -59,10 +61,27 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
 
     private String formatDate(String strDate) {
         try {
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date date = df.parse(strDate);
+            df.setTimeZone(TimeZone.getDefault());
+            //String formattedDate = df.format(date);
+
+            SimpleDateFormat sdfOutput = new SimpleDateFormat("d/MM/yyyy  H:mm:ss a"); // update format of date
+
+            return sdfOutput.format(date); // convert to string and return
+
+
+
+           // return formattedDate; // convert to string and return
+            /*
             SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // set parse mask
             Date date = sdformat.parse(strDate); // parse db data into date object
             SimpleDateFormat sdfOutput = new SimpleDateFormat("d MMM yy"); // update format of date
             return sdfOutput.format(date); // convert to string and return
+
+             */
         } catch (ParseException e) {
             e.printStackTrace(); // print error trace
         }

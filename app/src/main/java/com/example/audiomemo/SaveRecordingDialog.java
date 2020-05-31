@@ -19,11 +19,12 @@ public class SaveRecordingDialog extends AppCompatDialogFragment {
     private EditText etDescription; // edittext variable for UI element
     private SaveDialogListener listener; // member variable to hold listener interface
 
-    // creating a bundle to pass an argument to dialog, in this case whether there's been an error
-    public static SaveRecordingDialog newInstance(boolean error, Recording recording) {
+    // creating a bundle to pass arguments to dialog
+    public static SaveRecordingDialog newInstance(boolean error, Recording recording, int position) {
         SaveRecordingDialog dialog = new SaveRecordingDialog();
         Bundle args = new Bundle();
         args.putBoolean("error", error); // add error bool to arguments
+        args.putInt("position", position); // add clicked recycler position to arguments
         if(recording!=null)
             args.putSerializable("recording", recording); // add recording to arguments if it exists
         dialog.setArguments(args);
@@ -34,6 +35,7 @@ public class SaveRecordingDialog extends AppCompatDialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         boolean error = getArguments().getBoolean("error"); // used to flag error and change hint text/colour
+        final int position = getArguments().getInt("position"); // used to flag error and change hint text/colour
         int recordingID = -1;
         Recording recording = (Recording)getArguments().getSerializable("recording");
         if(recording!=null){ // recording passed in
@@ -42,8 +44,6 @@ public class SaveRecordingDialog extends AppCompatDialogFragment {
         }
         else
             Log.e("dialog record", "NOTHING"); // testing remove
-
-
 
         Log.e("DIALOG", "Error = "+error);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()); // create alert dialog builder
@@ -63,7 +63,7 @@ public class SaveRecordingDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String description = etDescription.getText().toString(); // get contents of description
-                        listener.onDialogPositiveClick(finalRecordingID, description);
+                        listener.onDialogPositiveClick(finalRecordingID, description, position);
                     }
                 });
 
@@ -93,7 +93,7 @@ public class SaveRecordingDialog extends AppCompatDialogFragment {
     }
 
     public interface SaveDialogListener{ //interface, this forces implementation of interface methods which handle clicks in dialog
-        void onDialogPositiveClick(int id, String strDescription); // ok clicked, pass back contents of description
+        void onDialogPositiveClick(int id, String strDescription, int position); // ok clicked, pass back contents of description
         void onDialogNegativeClick(int id); // cancel clicked
     }
 }
