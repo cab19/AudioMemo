@@ -14,6 +14,7 @@ import android.widget.Button;
 import java.util.Calendar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,17 +25,18 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SaveRecordingDialog.SaveDialogListener {
 
-    private static final String LOG_TAG = "Looper Test";
+    private static final String LOG_TAG = "AudioMemo";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private static String fileName = null;
+    private static String fileName = null; // recording filename
+    private String description = null; // description for the recording
 
     // private Button playButton,recordButton;
-    private FloatingActionButton fab_add,fab_stop;
-    private MediaRecorder recorder = null;
-    private MediaPlayer   player = null;
-    // might need these to determine if playing/recording or not
+    private FloatingActionButton fab_add,fab_stop; // floating action buttons
+    private MediaRecorder recorder = null; // recorder object
+    private MediaPlayer   player = null; // player object
+    // might need these to determine if playing/recording or not, THESE ARE TO BE DELETED THEY'RE NOW OBSOLETE
     private boolean boolPlaying = false;
     private boolean boolRecording = false;
 
@@ -62,8 +64,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // this starts the recording
-                openDialog();
+                //startRecording(view);
                 //Log.e("CLICK", "FAB add clicked: ");
+
+                // DIALOG TESTING
+                openDialog(false);
             }
         });
 
@@ -72,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // stop recording, present saveMemoDialog, user can confirm and add description or cancel
                 Log.e("CLICK", "FAB stop clicked: ");
+                stopRecording(view);
+                openDialog(false);
                 // save should add to data to db
 
                 // cancel should delete recording file
@@ -110,9 +117,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }));
 
-
-
-
         // AUDIO PERMISSION
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
     }
@@ -128,16 +132,6 @@ public class MainActivity extends AppCompatActivity {
         if (!permissionToRecordAccepted) finish();
 
     }
-
-    // DIALOG
-    // just need a description
-    public void openDialog() {
-        Log.e("CLICK", "open dialog: ");
-        SaveRecordingDialog saveDialog = new SaveRecordingDialog();
-        saveDialog.show(getSupportFragmentManager(), "examplez");
-    }
-
-
 
     public void handlePlaying(View v) { // this is the start playing event handler
         boolPlaying = (boolPlaying) ? false : true; // toggle playing
@@ -238,6 +232,34 @@ public class MainActivity extends AppCompatActivity {
             recorder.release();
             recorder = null;
         }
+    }
+
+    // DIALOG
+
+    // just need a description
+    public void openDialog(Boolean error) {
+        Log.e("CLICK", "open dialog: ");
+        //SaveRecordingDialog saveDialog = new SaveRecordingDialog();
+        //saveDialog.show(getSupportFragmentManager(), "Save Dialog");
+
+        SaveRecordingDialog saveDialog = SaveRecordingDialog.newInstance(
+                error);
+        saveDialog.show(getSupportFragmentManager(), "Save Dialog");
+    }
+
+    // OVERRIDE SaveRecordingDialog listener interface to handle button events
+    @Override
+    public void onDialogPositiveClick(String strDescription) { // ok button clicked
+        description = strDescription; // update member variable to contents of description edittext in save dialog
+        Log.e(LOG_TAG, "Description: "+description);
+        // Check that description is not null?
+        if(description.length() == 0)
+            openDialog(true);
+    }
+
+    @Override
+    public void onDialogNegativeClick() { // cancel button clicked
+        Log.e(LOG_TAG, "CANCEL WAS CLICKED");
     }
 
     @Override // overriding the onstop method to make sure all resources are released when stopped.
