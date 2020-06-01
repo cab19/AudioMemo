@@ -55,7 +55,9 @@ public class PlayRecordingDialog extends AppCompatDialogFragment {
         builder.setView(view); // use builder, set view
         // Assigning and updating UI elements
         tvDescription = view.findViewById(R.id.tvDescription); // link to ui edit text
-        tvDescription.setText(recording.getDescription());
+        String description = recording.getDescription(); // get description
+        description = (description.length()>20) ? description.substring(0,20) + "..." : description; // limit characters to 20
+        tvDescription.setText(description);
         tvDate = view.findViewById(R.id.tvDate); // link to ui edit text
         tvDate.setText(formatDate(recording.getTimeStamp()));
         // Buttons

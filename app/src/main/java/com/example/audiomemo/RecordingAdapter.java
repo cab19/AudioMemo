@@ -55,7 +55,10 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         //Log.e("TIME?", "SQLite ERROR");
         holder.tvTimeStamp.setText(formatDate(recordingList.get(position).getTimeStamp())); // update timestamp, using formatted date from db
-        holder.tvDescription.setText(recordingList.get(position).getDescription()); //updates description to value at current position
+        // get description, if longer than x, cut it and add ...
+        String description = recordingList.get(position).getDescription(); // get description
+        description = (description.length()>20) ? description.substring(0,20) + "..." : description; // limit characters to 20
+        holder.tvDescription.setText(description); //updates description to value at current position
         //holder.tvDescription.setImageResource(categoryList.get(position).getLogo()); //updates logo to image value in array at position
     }
 

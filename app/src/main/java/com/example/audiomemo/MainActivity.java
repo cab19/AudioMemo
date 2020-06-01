@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
     private static final String LOG_TAG = "AudioMemo";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static String fileName = null; // recording filename
-    private String description = null; // description for the recording
+    //private String description = null; // description for the recording
     private RecordingAdapter mAdapter; // recording adapter for recyclerview
     private List<Recording> recordings;
 
@@ -59,8 +59,6 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db = new DatabaseHelper(this); // instantiate dbhelper object
-
-        //ImageButton ib = findViewById(R.id.playButton);
 
         // link to UI elements
         fab_add = findViewById(R.id.fab_add); // reference to add recording button
@@ -258,6 +256,8 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
 
     // Opens play dialog
     public void openPlayDialog(int position) {
+        if (player != null) // delete stale player if it exists
+            destroyPlayer(); // destroy player object
         Log.e("CLICK", "open PLAY dialog: ");
         Recording tempRec = db.getRecording(recordings.get(position).getID());
         PlayRecordingDialog playDialog = PlayRecordingDialog.newInstance(tempRec);
