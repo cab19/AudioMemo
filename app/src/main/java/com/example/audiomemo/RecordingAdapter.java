@@ -61,31 +61,16 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
 
     private String formatDate(String strDate) {
         try {
-
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date date = df.parse(strDate);
-            df.setTimeZone(TimeZone.getDefault());
-            //String formattedDate = df.format(date);
-
-            SimpleDateFormat sdfOutput = new SimpleDateFormat("d/MM/yyyy  H:mm:ss a"); // update format of date
-
-            return sdfOutput.format(date); // convert to string and return
-
-
-
-           // return formattedDate; // convert to string and return
-            /*
-            SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // set parse mask
+            SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH); // set parse mask
+            sdformat.setTimeZone(TimeZone.getTimeZone("UTC")); // declare time in UTC
             Date date = sdformat.parse(strDate); // parse db data into date object
-            SimpleDateFormat sdfOutput = new SimpleDateFormat("d MMM yy"); // update format of date
+            sdformat.setTimeZone(TimeZone.getDefault()); // set time to local timezone
+            SimpleDateFormat sdfOutput = new SimpleDateFormat("d/MM/yyyy  H:mm:ss a"); // update format of date
             return sdfOutput.format(date); // convert to string and return
-
-             */
         } catch (ParseException e) {
             e.printStackTrace(); // print error trace
         }
-        return ""; // required but never called...
+        return ""; // required only if error...
     }
 
     @Override

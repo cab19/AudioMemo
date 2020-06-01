@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import java.io.File;
 import java.util.Calendar;
@@ -29,7 +30,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SaveRecordingDialog.SaveDialogListener {
+public class MainActivity extends AppCompatActivity implements SaveRecordingDialog.SaveDialogListener, PlayRecordingDialog.PlayDialogListener {
 
     private static final String LOG_TAG = "AudioMemo";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db = new DatabaseHelper(this); // instantiate dbhelper object
+
+        //ImageButton ib = findViewById(R.id.playButton);
 
         // link to UI elements
         fab_add = findViewById(R.id.fab_add); // reference to add recording button
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
             @Override
             public void onClick(View view, final int position) {
                 Log.e("CLICK", "recycler clicked: "+position);
+                openPlayDialog(position);
             }
 
             @Override
@@ -245,12 +249,19 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
     }
 
     // DIALOG
-
-    // just need a description
+    // Opens save/edit dialog
     public void openDialog(Boolean error, Recording recording, int position) {
-        Log.e("CLICK", "open dialog: ");
+        Log.e("CLICK", "open SAVE/EDIT dialog: ");
         SaveRecordingDialog saveDialog = SaveRecordingDialog.newInstance(error, recording, position);
         saveDialog.show(getSupportFragmentManager(), "Save Dialog");
+    }
+
+    // Opens play dialog
+    public void openPlayDialog(int position) {
+        Log.e("CLICK", "open PLAY dialog: ");
+        Recording tempRec = db.getRecording(recordings.get(position).getID());
+        PlayRecordingDialog playDialog = PlayRecordingDialog.newInstance(tempRec);
+        playDialog.show(getSupportFragmentManager(), "Play Dialog");
     }
 
     // OVERRIDE SaveRecordingDialog listener interface to handle button events
@@ -258,7 +269,6 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
     public void onDialogPositiveClick(int recordingID, String strDescription, int position) { // ok button clicked
         // EITHER INSERT OR UPDATE
         // INSERT recordingID == -1
-
         //description = strDescription; // update member variable to contents of description edittext in save dialog
         Recording temp;
         // Check that description is not null
@@ -311,7 +321,6 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
     private void showOptionsDialog(final int position) {
         CharSequence options[] = new CharSequence[]{"Edit", "Delete"};
 
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose option")
         .setItems(options, new DialogInterface.OnClickListener() {
@@ -326,19 +335,57 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
 
                     Log.e(LOG_TAG, "Open saverecordingdialog "+tempRec.getID()); // testing remove
                 } else {
-                    //deleteRecording(position);
                     Log.e(LOG_TAG, "delete recording "+tempRec.getID()); // testing remove
-                    // delete file
-                    deleteRecording(tempRec.getFilename());
-                    // delete reference from recordings list
-                    recordings.remove(position);
+                    deleteRecording(tempRec.getFilename());  // delete file
+                    recordings.remove(position); // delete reference from recordings list
                     mAdapter.notifyDataSetChanged(); // update recyclerview
-                    // delete from db
-                    db.deleteRecording(tempRec);
+                    db.deleteRecording(tempRec); // delete from db
                 }
             }
         });
         builder.show();
+    }
+
+    @Override
+    public void playRecording(String playFile) {
+        Log.e("BUTTON", "PLAY CLICKED "+playFile); // testing remove
+        if(player == null) {
+            player = new MediaPlayer();
+            try {
+                player.setDataSource(playFile);
+                player.prepare();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "prepare() failed");
+            }
+        }
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                destroyPlayer(); // when file ends we stop and destroy player
+            }
+        });
+        player.start();
+    }
+
+    @Override
+    public void pauseRecording() {
+        Log.e("BUTTON", "PAUSE CLICKED ");
+        if(player!=null){
+            player.pause();
+        }
+    }
+
+    @Override
+    public void stopRecording() {
+        Log.e("BUTTON", "STOP CLICKED ");
+        destroyPlayer();
+    }
+
+    private void destroyPlayer(){
+        if (player != null) {
+            player.release();
+            player = null;
+        }
     }
 
     @Override // overriding the onstop method to make sure all resources are released when stopped.
@@ -349,9 +396,7 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
             recorder = null;
         }
 
-        if (player != null) {
-            player.release();
-            player = null;
-        }
+        if (player != null)
+            destroyPlayer(); // destroy player object
     }
 }
