@@ -1,15 +1,12 @@
 package com.example.audiomemo;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,7 +24,6 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
         this.context = context;
         this.recordingList = recordingList;
     }
-
 
     // handles the linking of UI elements
     public class MyViewHolder extends RecyclerView.ViewHolder{
@@ -53,22 +49,20 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.MyVi
 
     @Override // populates each view with provided data
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
-        //Log.e("TIME?", "SQLite ERROR");
         holder.tvTimeStamp.setText(formatDate(recordingList.get(position).getTimeStamp())); // update timestamp, using formatted date from db
-        // get description, if longer than x, cut it and add ...
         String description = recordingList.get(position).getDescription(); // get description
         description = (description.length()>20) ? description.substring(0,20) + "..." : description; // limit characters to 20
         holder.tvDescription.setText(description); //updates description to value at current position
-        //holder.tvDescription.setImageResource(categoryList.get(position).getLogo()); //updates logo to image value in array at position
     }
 
+    // method to format time and to convert it from UTC (it's stored in db in UTC)
     private String formatDate(String strDate) {
         try {
             SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH); // set parse mask
             sdformat.setTimeZone(TimeZone.getTimeZone("UTC")); // declare time in UTC
             Date date = sdformat.parse(strDate); // parse db data into date object
             sdformat.setTimeZone(TimeZone.getDefault()); // set time to local timezone
-            SimpleDateFormat sdfOutput = new SimpleDateFormat("d/MM/yyyy  H:mm:ss a"); // update format of date
+            SimpleDateFormat sdfOutput = new SimpleDateFormat("d/MM/yyyy  H:mm:ss"); // update format of date
             return sdfOutput.format(date); // convert to string and return
         } catch (ParseException e) {
             e.printStackTrace(); // print error trace

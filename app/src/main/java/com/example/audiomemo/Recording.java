@@ -54,9 +54,4 @@ public class Recording implements Serializable {
     public void setTimeStamp(String strTimeStamp) {
         this.mTimeStamp = strTimeStamp;
     }
-
-    public boolean equals(Recording object2) {
-        Log.e("EQUALS", "EQUALS CALLED"); // print error to log
-        return object2 instanceof Recording && mID.equals(((Recording)object2).mID);
-    }
 }

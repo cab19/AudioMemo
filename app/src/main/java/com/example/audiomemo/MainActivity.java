@@ -6,46 +6,31 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-// import android.support.annotation.NonNull;
-// import android.support.v4.app.ActivityCompat;
-// import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-
 import java.io.File;
 import java.util.Calendar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.io.IOException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SaveRecordingDialog.SaveDialogListener, PlayRecordingDialog.PlayDialogListener {
 
-    private static final String LOG_TAG = "AudioMemo";
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private static final String LOG_TAG = "AudioMemo"; // used for testing debugging
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200; // int flag for audio permission
     private static String fileName = null; // recording filename
-    //private String description = null; // description for the recording
     private RecordingAdapter mAdapter; // recording adapter for recyclerview
-    private List<Recording> recordings;
-
-    private Button playButton,recordButton;
+    private List<Recording> recordings; // list of recordings
     private FloatingActionButton fab_add,fab_stop; // floating action buttons
     private MediaRecorder recorder = null; // recorder object
     private MediaPlayer   player = null; // player object
-    // might need these to determine if playing/recording or not, THESE ARE TO BE DELETED THEY'RE NOW OBSOLETE
-    private boolean boolPlaying = false;
-    private boolean boolRecording = false;
 
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
@@ -68,9 +53,7 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
         fab_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // this starts the recording
-                startRecording(view);
-                //Log.e("CLICK", "FAB add clicked: ");
+                startRecording(view); // this starts the recording
             }
         });
 
@@ -78,25 +61,15 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
             @Override
             public void onClick(View view) {
                 // stop recording, present saveMemoDialog, user can confirm and add description or cancel
-                Log.e("CLICK", "FAB stop clicked: ");
-                stopRecording(view);
-                openDialog(false, null, -1);
-                // save should add to data to db
-                // cancel should delete recording file
+                stopRecording(view); // stops the recording
+                openDialog(false, null, -1); // open the save dialog
             }
         });
 
-/*
-        // DB TESTING
-        if(db.insert(fileName, "test description") < 1) // timestamp automatic
-            Log.e(LOG_TAG, "SQLite ERROR");
-
- */
         // RECYCLER VIEW
         recordings = db.getAllRecordings(); // get all recordings
         RecyclerView recyclerView; // create recyclerView
         recyclerView = findViewById(R.id.recordRecycler); // link to recycler UI element
-
         mAdapter = new RecordingAdapter(this, recordings); // create an adapter
         LinearLayoutManager t = new LinearLayoutManager(this); // create linear layout manager
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
@@ -104,19 +77,16 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
         recyclerView.addItemDecoration(mDividerItemDecoration); // adding divider
         recyclerView.setLayoutManager(t); // set layout manager
         recyclerView.setAdapter(mAdapter); // set adapter to one instantiated above
-
         recyclerView.addOnItemTouchListener(new RecyclerViewListener(this, // adding click listener via interface for recycler
                 recyclerView, new RecyclerViewListener.ClickListener() {
             @Override
             public void onClick(View view, final int position) {
-                Log.e("CLICK", "recycler clicked: "+position);
-                openPlayDialog(position);
+                openPlayDialog(position); // opens play dialog, passing in position in recyclerview
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                Log.e("CLICK", "recycler LONG clicked: "+position);
-                showOptionsDialog(position); // open dialog, position is order in list, need to get id
+                showOptionsDialog(position); // open options dialog, passing in position in recyclerview
             }
         }));
 
@@ -132,21 +102,16 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
                 permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED; // set permission granted
                 break;
         }
-        if (!permissionToRecordAccepted) finish();
+        if (!permissionToRecordAccepted) finish(); // can't run app without recording permission...
     }
 
     // The start recording event handler
     // Handles creation of path/filename, toggling buttons, recording, etc
     public void startRecording(View v) {
-
-
         // Set recording directory & filename
         fileName = getExternalCacheDir().getAbsolutePath(); // setting path for the audio file
         fileName += "/"+Calendar.getInstance().getTimeInMillis()+".m4a"; // setting filename for audio using time
-        Log.e(LOG_TAG, "START RECORDING: "+fileName);
-
-        //fab_add.setVisibility(View.INVISIBLE); // hide add fab
-        //fab_stop.setVisibility(View.VISIBLE); // show stop fab
+        // toggle fab's
         fab_add.hide();
         fab_stop.show();
 
@@ -168,131 +133,57 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
     }
 
     // The stop recording event handler
-    // Toggle buttons, stop recording and release resources, present saveMemoDialog
-    public void stopRecording(View v) { // this is the start recording event handler
-        Log.e(LOG_TAG, "fab_stop clicked");
-        //fab_add.setVisibility(View.VISIBLE); // show add fab
-        //fab_stop.setVisibility(View.INVISIBLE); // hide stop fab
+    // Toggle buttons, stop recording and release resources
+    public void stopRecording(View v) {
+        //toggle fab's
         fab_add.show();
         fab_stop.hide();
+
         recorder.stop(); // stop recording
         recorder.release(); // release recording resources
         recorder = null; // unlink recorder
-
-        // saveMemoDialog
-    }
-
-    public void handleRecording(View v) { // this is the start recording event handler
-
-        //fileName = getExternalCacheDir().getAbsolutePath(); // setting path for the audio file
-        //fileName += "/"+Calendar.getInstance().getTimeInMillis()+".m4a"; // setting filename for audio using time
-
-        Log.e(LOG_TAG, "recording clicked"+fileName);
-        boolRecording = (boolRecording) ? false : true; // toggle recording boolean
-        if(boolRecording) {
-            //fab_add.setVisibility(View.INVISIBLE); // hide add fab
-            //fab_stop.setVisibility(View.VISIBLE); // show stop fab
-            recordButton.setText("Stop recording");
-            boolRecording = true;
-            playButton.setEnabled(false); // testing
-            recordButton.setEnabled(true); // testing
-
-
-
-            // MP4 quality settings from https://stackoverflow.com/questions/56854199/how-to-record-good-quality-audio-using-mediarecoder-in-android
-            recorder = new MediaRecorder();
-            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            recorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-            recorder.setAudioEncodingBitRate(16*44100);
-            recorder.setAudioSamplingRate(44100);
-            recorder.setOutputFile(fileName);
-
-            try {
-                recorder.prepare();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "prepare() failed");
-            }
-            recorder.start();
-        }
-        else{
-            recordButton.setText("Start recording");
-            playButton.setEnabled(true); // testing
-            boolRecording = false;
-            recorder.stop();
-            recorder.release();
-            recorder = null;
-        }
-    }
-
-    public void handlePlaying(View v) { // this is the start playing event handler
-        boolPlaying = (boolPlaying) ? false : true; // toggle playing
-        if(boolPlaying) {
-            playButton.setText("Stop playing");
-            player = new MediaPlayer();
-            try {
-                player.setDataSource(fileName);
-                player.prepare();
-                player.start();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "prepare() failed");
-            }
-        }
-        else{
-            playButton.setText("Start playing");
-            boolPlaying = false;
-            player.release();
-            player = null;
-        }
     }
 
     // DIALOG
     // Opens save/edit dialog
     public void openDialog(Boolean error, Recording recording, int position) {
-        Log.e("CLICK", "open SAVE/EDIT dialog: ");
-        SaveRecordingDialog saveDialog = SaveRecordingDialog.newInstance(error, recording, position);
-        saveDialog.show(getSupportFragmentManager(), "Save Dialog");
+        SaveRecordingDialog saveDialog = SaveRecordingDialog.newInstance(error, recording, position); // passing in args
+        saveDialog.setCancelable(false); // prevents user clicking off dialog, to prevent orphaned recording files
+        saveDialog.show(getSupportFragmentManager(), "Save Dialog"); // show dialog
     }
 
     // Opens play dialog
     public void openPlayDialog(int position) {
         if (player != null) // delete stale player if it exists
             destroyPlayer(); // destroy player object
-        Log.e("CLICK", "open PLAY dialog: ");
-        Recording tempRec = db.getRecording(recordings.get(position).getID());
-        PlayRecordingDialog playDialog = PlayRecordingDialog.newInstance(tempRec);
-        playDialog.show(getSupportFragmentManager(), "Play Dialog");
+        Recording tempRec = db.getRecording(recordings.get(position).getID()); // get recording
+        PlayRecordingDialog playDialog = PlayRecordingDialog.newInstance(tempRec); // create play dialog
+        playDialog.show(getSupportFragmentManager(), "Play Dialog"); // show dialog
     }
 
-    // OVERRIDE SaveRecordingDialog listener interface to handle button events
+    // OVERRIDE SaveRecordingDialog listener interface to handle button events from savedialog
+    // positive button handler
     @Override
     public void onDialogPositiveClick(int recordingID, String strDescription, int position) { // ok button clicked
-        // EITHER INSERT OR UPDATE
-        // INSERT recordingID == -1
-        //description = strDescription; // update member variable to contents of description edittext in save dialog
-        Recording temp;
-        // Check that description is not null
-        if(strDescription.length() == 0)
+        // determines if recording is updating (ie edited existing) or inserting (ie new). recordingID will equal -1 to flag insertion
+        Recording temp; // temp variable to holder recording
+        if(strDescription.length() == 0) // Check that description is not null
             openDialog(true,null, -1); // show dialog again with error message
         else{ // save memo
-            // need to ascertain if this is an edit or insert...
-            if(recordingID!=-1){ //UPDATE
+            if(recordingID!=-1){ // if recordingID doesn't = -1 it is an update to existing recording.
                 temp = db.getRecording(recordingID); //get recording
                 temp.setDescription(strDescription); //update description
-                db.updateRecording(temp); //up db
-                // refreshing the list
-                recordings.set(position, temp);
-                mAdapter.notifyItemChanged(position);
+                db.updateRecording(temp); //update db
+                recordings.set(position, temp); // change targeted item in recyclerview
+                mAdapter.notifyItemChanged(position); // refresh recyclerview
             }
             else { // INSERT
                 long id = db.insertRecording(fileName, strDescription); // insert new memo
                 if (id < 1)  // error with insert
                     Log.e(LOG_TAG, "SQLite ERROR"); // print error to log
                 else {
-                    Log.e(LOG_TAG, "ID: " + id); // print id to log
                     temp = db.getRecording(id); //get recording
                     if (temp != null) {
-                        Log.e(LOG_TAG, "descrip???? " + temp.getDescription()); // print id to log
                         recordings.add(0, temp); // add recording to list
                         mAdapter.notifyDataSetChanged(); // update recyclerview
                     }
@@ -301,14 +192,11 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
         }
     }
 
+    // nagetive button handler
     @Override
-    public void onDialogNegativeClick(int id) { // cancel button clicked
-        // check if there's a valid id.
-        Log.e(LOG_TAG, "CANCEL WAS CLICKED");
-        if(id==-1) {
-            Log.e(LOG_TAG, "DELETE");
+    public void onDialogNegativeClick(int id) {
+        if(id==-1)  // if there's a valid id, delete recording
             deleteRecording(fileName);
-        }
     }
 
     private void deleteRecording(String fileRef)
@@ -317,25 +205,20 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
         file.delete(); // delete file
     }
 
-
+    // options dialog method
     private void showOptionsDialog(final int position) {
         CharSequence options[] = new CharSequence[]{"Edit", "Delete"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose option")
+        builder.setTitle("Choose Option:")
         .setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int selection) {
-                Log.e(LOG_TAG, "SELECTION "+selection); // testing remove
-                Recording tempRec = db.getRecording(recordings.get(position).getID());
-                if (selection == 0) { // reference to selection, 0=edit or 1=delete
-                    //showNoteDialog(true, notesList.get(position), position);
-                    //saveRecordingDialog - pass recording in, if recording not null insert to db otherwise update
-                    openDialog(false, tempRec, position);
-
-                    Log.e(LOG_TAG, "Open saverecordingdialog "+tempRec.getID()); // testing remove
-                } else {
-                    Log.e(LOG_TAG, "delete recording "+tempRec.getID()); // testing remove
+                Recording tempRec = db.getRecording(recordings.get(position).getID()); // get recording
+                // reference to selection made by user, 0=edit or 1=delete
+                if (selection == 0) // edit memo
+                    openDialog(false, tempRec, position); //saveRecordingDialog - pass recording in, if recording not null insert to db otherwise update
+                else { // delete memo
                     deleteRecording(tempRec.getFilename());  // delete file
                     recordings.remove(position); // delete reference from recordings list
                     mAdapter.notifyDataSetChanged(); // update recyclerview
@@ -343,48 +226,46 @@ public class MainActivity extends AppCompatActivity implements SaveRecordingDial
                 }
             }
         });
-        builder.show();
+        builder.show(); // show dialog
     }
 
+    // handle media controls, interface of PlayRecordingDialog
     @Override
     public void playRecording(String playFile) {
-        Log.e("BUTTON", "PLAY CLICKED "+playFile); // testing remove
-        if(player == null) {
-            player = new MediaPlayer();
-            try {
+        if(player == null) { // no player
+            player = new MediaPlayer(); // create player
+            try { // try to set source file
                 player.setDataSource(playFile);
                 player.prepare();
-            } catch (IOException e) {
+            } catch (IOException e) { // error
                 Log.e(LOG_TAG, "prepare() failed");
             }
         }
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                destroyPlayer(); // when file ends we stop and destroy player
+            public void onCompletion(MediaPlayer mediaPlayer) { // handler for destroying player when file completes
+                destroyPlayer();
             }
         });
-        player.start();
+        player.start(); // start the recording
     }
 
     @Override
     public void pauseRecording() {
-        Log.e("BUTTON", "PAUSE CLICKED ");
-        if(player!=null){
+        if(player!=null){ // check if player exists
             player.pause();
         }
     }
 
     @Override
     public void stopRecording() {
-        Log.e("BUTTON", "STOP CLICKED ");
-        destroyPlayer();
+        destroyPlayer(); // destroy player
     }
 
     private void destroyPlayer(){
-        if (player != null) {
-            player.release();
-            player = null;
+        if (player != null) { // check if player exists
+            player.release(); // release resources
+            player = null; // set player to null
         }
     }
 

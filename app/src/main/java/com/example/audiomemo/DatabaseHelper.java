@@ -6,14 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
-import androidx.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-
+    // DATABASE DETAILS
     public static final String DATABASE_NAME = "audiomemo.db";
     public static final String TABLE_NAME = "recordings";
     public static final String COLUMN_ID = "recording_id";
@@ -24,9 +21,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
     }
 
+    // create table
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE "+TABLE_NAME +"("+
@@ -36,12 +33,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_TIMESTAMP+" DEFAULT CURRENT_TIMESTAMP)");
     }
 
+    // when DB version changes drop and recreate table
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 
+    // insert recording into db
     public long insertRecording(String filename , String description)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -53,6 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return newRowId;
     }
 
+    // return a single recording from db
     public Recording getRecording(long id)
     {
         SQLiteDatabase db = getReadableDatabase(); // create db for reading
@@ -77,6 +77,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return recording; // return recording
     }
 
+    // return a list of all recordings from db
     public List<Recording> getAllRecordings ()
     {
         List<Recording> recordings = new ArrayList<>(); // list to hold recordings
@@ -96,7 +97,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP))
                 ); // instantiate recording object
 
-                Log.e("SQL: ", recording.getFilename());
                 recordings.add(recording);
             } while (cursor.moveToNext());
         }
@@ -105,6 +105,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return recordings; // return list of recordings
     }
 
+    // update existing recording in db
     public long updateRecording(Recording recording) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -115,6 +116,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return response;
     }
 
+    // delete recording from db
     public void deleteRecording(Recording recording) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, COLUMN_ID + " = ?",

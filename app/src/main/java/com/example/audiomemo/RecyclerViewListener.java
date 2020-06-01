@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 // https://medium.com/@harivigneshjayapalan/android-recyclerview-implementing-single-item-click-and-long-press-part-ii-b43ef8cb6ad8
 
 public class RecyclerViewListener implements RecyclerView.OnItemTouchListener {
-
+    // member variables
     private ClickListener clicklistener;
     private GestureDetector gestureDetector;
 
@@ -51,7 +51,7 @@ public class RecyclerViewListener implements RecyclerView.OnItemTouchListener {
 
     }
 
-    // interface, used to ensure calling class implements below click handlers
+    // interface methods, implemented by calling class
     public interface ClickListener {
         void onClick(View view, int position);
         void onLongClick(View view, int position);
